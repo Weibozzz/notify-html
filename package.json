@@ -1,6 +1,6 @@
 {
   "name": "notify-html",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "页面检测更新提示",
   "main": "index.js",
   "scripts": {
