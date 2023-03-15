@@ -11,18 +11,27 @@ function http(url) {
   });
 }
 function notify ({
-                   url,
+                   url = '/',
                    timer = 30 * 1000,
-                   callback = () => {}
+                   callback = () => {},
+                   storageKey = 'notify_version_txt'
                  }) {
   let timerId
-  if (!url) {
-    console.error('notify-html err', 'url 不存在');
-    return;
-  }
   const requestFn = () => {
     http(url).then(data => {
-      callback(data)
+      let newVersion = '';
+      data.replace(/.*data-version-time\='?"?(\d+).*/,(a, v) => {
+        newVersion = v
+      })
+      const version = localStorage.getItem(storageKey)
+      if (!version) {
+        localStorage.setItem(storageKey, data)
+        return
+      }
+      if (newVersion !== version) {
+        callback(data, newVersion)
+        localStorage.setItem(storageKey, newVersion)
+      }
     })
   }
   const intervalFn = () => {
