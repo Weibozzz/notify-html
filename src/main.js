@@ -28,7 +28,7 @@ function notify ({
         localStorage.setItem(storageKey, data)
         return
       }
-      if (newVersion !== version) {
+      if (version && newVersion !== version) {
         callback(data, newVersion)
         localStorage.setItem(storageKey, newVersion)
       }
