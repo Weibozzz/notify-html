@@ -1,5 +1,26 @@
 'use strict';
 
+function toUrl (urlObj) {
+  if (!urlObj) {
+    return ''
+  }
+  return Object.keys(urlObj)
+    .reduce((total, item, index) => {
+      total += `${index ? '&' : '' }${item}=${urlObj[item]}`;
+      return total;
+    },'?')
+}
+function parse (href =  window.location.href, isDecode = false) {
+  var urlParams = href.split('?')[1];
+  var transData = function replaceHandler (item, result) {
+    return item === '' ? result : isDecode ? decodeURIComponent(result) : result
+  };
+  return urlParams ? JSON.parse('{"' +
+    urlParams
+      .replace(/&/g, '","')
+      .replace(/=/g, '":"')
+    + '"}', transData) : {}
+}
 function http(url) {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
@@ -20,7 +41,12 @@ function notify ({
                  }) {
   let timerId;
   const requestFn = () => {
-    http(url).then(data => {
+    const urlQueryObj = parse(url);
+    const newUrl = toUrl({
+      ...urlQueryObj,
+      timeStr: Date.now()
+    });
+    http(newUrl).then(data => {
       let newVersion = '';
       data.replace(/.*data-version-time\='?"?(\d+).*/,(a, v) => {
         newVersion = v;
